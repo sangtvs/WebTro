@@ -1,0 +1,155 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+@{
+    Database db = new Database();
+    List<Tro> Tro = db.GetPhong();
+}
+@model Tro
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true">
+    <link rel="stylesheet" href="~/font\fontawesome-free-6.4.2-web\fontawesome-free-6.4.2-web\css\all.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="~/js/site.js"></script>
+</head>
+<body>
+    <div class="container">
+
+        <main class="main">
+            <div class="main__anhnen">
+            </div>
+            <div class="BlockSearch">
+                <div class="khuvuc">
+                    <label for="">Khu Vực</label>
+                    <select id="selectKhuvuc">
+                        <option value="hanoi" selected>Hà Nội</option>
+                        <option value="badinh">Ba Đình, Hà Nội</option>
+                        <option value="longbien">Long Biên, Hà Nội</option>
+                    </select>
+                </div>
+                <div class="giatien">
+                    <label for="">Giá tiền</label>
+                    <select id="selectGiatien">
+                        <option value="chonmucgia" selected>Chon mức giá</option>
+                        <option value="tatca">Tất cả các mức giá</option>
+                        <option value="tren5tr">Trên 5 triệu</option>
+                        <option value="3-5tr">3-5 triệu</option>
+                        <option value="1-3tr">1-3 triệu</option>
+                        <option value="duoi1tr">dưới 1 triệu</option>
+                    </select>
+                </div>
+                <div class="dientich">
+                    <label for="">Diện tích</label>
+                    <select id="selectDientich">
+                        <option value="chondientich">Chọn diện tích</option>
+                        <option value="tatca">Tất cả các diện tích</option>
+                        <option value="duoi20m">nhỏ hơn 20m&sup2;</option>
+                        <option value="20m-30m">20m&sup2; - 30m&sup2;</option>
+                        <option value="tren30m">lớn hơn 30m&sup2;</option>
+                    </select>
+                </div>
+                <div class="btn">
+                    <input type="button" value="timkiem">
+                </div>
+            </div>
+            <div class="main__tiltle">
+                <h3>CHO THUÊ PHÒNG TRỌ MỚI NHẤT</h3>
+            </div>
+            <div class="main__content">
+                @foreach (var ptro in Tro)
+                {
+                    <a href="@Url.Action("chitiet", "Home", new { id = ptro.Id })" class="link-cart">
+                        <div class="cart item1">
+                            <div class="cart-img">
+                                <img src="@Url.Action("GetImage", "Home", new { id = ptro.Id })" alt="Ảnh" />
+                            </div>
+                            <div class="cart-title">
+                                <p>@ptro.ten</p>
+                            </div>
+                            <div class="cart-price">
+                                <span>Giá tiền: @ptro.giatien đ</span>
+                                <span>Diện tích: @ptro.dientich m&sup2;</span>
+                            </div>
+                            <div class="cart-address">
+                                <p>Địa chỉ: @ptro.diachi</p>
+                            </div>
+                            <div  class="xoa">
+                                <form method="post" action="@Url.Action("DeletePhong", "Home", new { id = ptro.Id })">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-danger" onclick="return confirm('Bạn có chắc muốn xóa?')"><i class="fa-solid fa-trash-can"></i></button>
+                                </form>
+                                @*<a href="@Url.Action("DeletePhong", "Home", new { id = ptro.Id })"><i class="fa-solid fa-trash-can"></i></a>*@
+                            </div>
+                        </div>
+                    </a>
+                }
+                @*@foreach(var tro in Tro){
+                <a href="/Home/chitiet" class="link-cart">
+                <div class="cart item1">
+                <div class="cart-img">
+                <img src="~/img/phongmau.jpg" alt="">
+                </div>
+                <div class="cart-title">
+                <p>CCMN 130 Mậu Lương đầy đủ đồ - Chính Chủ</p>
+                </div>
+                <div class="cart-price">
+                <span>3.300.000đ</span>
+                <span>25m&sup2;</span>
+                </div>
+                <div class="cart-address">
+                <p>130 Mậu Lương, Phường Kiến Hưng, Quận Hà Đông, Hà Nội</p>
+                </div>
+                </div>
+                </a>
+                }*@
+            </div>
+            <div class="main__btn">
+                <input type="button" value="xem them">
+            </div>
+        </main>
+        <div class="dangtin" id="postFormContainer">
+            <div class="dangtin_content">
+                <span class="close-button" onclick="closePostForm()">X</span>
+                <h1>Đăng thông tin phòng</h1>
+                @using (Html.BeginForm("ThemPhong", "Home", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                {
+                    <label for="title">Tiêu đề:</label>
+                    @Html.TextBoxFor(model => model.ten, new { @class = "form-input" })
+
+                    <label for="description">Mô tả:</label>
+                    @Html.TextBoxFor(model => model.mota, new { @class = "form-input" })
+
+                    <label for="contact">Liên hệ:</label>
+                    @Html.TextBoxFor(model => model.sdt, new { @class = "form-input" })
+
+                    <label for="contact">Địa chỉ:</label>
+                    @Html.TextBoxFor(model => model.diachi, new { @class = "form-input" })
+
+                    <label for="price">Giá tiền:</label>
+                    @Html.TextBoxFor(model => model.giatien, new { @class = "form-input" })
+
+                    <label for="area">Diện tích:</label>
+                    @Html.TextBoxFor(model => model.dientich, new { @class = "form-input" })
+
+                    <div id="imageContainer">
+                        <label for="images">Ảnh phòng:</label>
+                        @Html.TextBoxFor(model => model.AnhPhong, new { type = "file", accept = "image/*" })
+                    </div>
+
+                    <button type="button" id="addImage">Thêm ảnh</button>
+
+                    <br>
+
+                    <button type="submit">Đăng Tin</button>
+                }
+            </div>
+        </div>
+    </div>
+</body>
+</html>
